@@ -1,0 +1,38 @@
+#!/bin/bash
+
+NC="\033[0m";
+BGreen="\033[30;42m";
+BIPink="\033[1;35m";
+BIBlue="\033[1;34m";
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(js|jsx|ts|tsx|css|json|html|md)$") || true;
+
+if [ -n "$STAGED_FILES" ];
+then
+    echo -e "${BGreen}                                          ${NC}";
+    echo -e "${BGreen}  Formatando arquivos do projeto... 💄✨  ${NC}";
+    echo -e "${BGreen}                                          ${NC}\n";
+
+    for FILE in $STAGED_FILES;
+    do
+        if [ -e "$FILE" ];
+        then
+            echo -e "${BIPink}🌸 Formatando ${FILE}... ${NC}";
+            npx prettier --write "${FILE}" > /dev/null 2>&1;
+            git add "${FILE}";
+
+            case "$FILE" in
+                *.js|*.jsx|*.ts|*.tsx)
+                    echo -e "${BIBlue}🔍 Verificando ${FILE} com ESLint... ${NC}";
+                    npx eslint --fix "${FILE}";
+                    git add "${FILE}";;
+            esac
+        fi
+    done
+
+    echo -e "\n${BGreen}                                     ${NC}";
+    echo -e "${BGreen}  Tudo certo! Commit concluído 👮🎉  ${NC}";
+    echo -e "${BGreen}                                     ${NC}\n";
+fi
+
+exit 0;

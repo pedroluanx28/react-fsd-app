@@ -1,0 +1,35 @@
+#!/bin/bash
+
+NC="\033[0m";
+BGreen="\033[30;42m";
+BIBlue="\033[1;34m";
+BRed="\033[1;31m";
+
+echo -e "${BIBlue}🔍 Realizando análise estática com ESLint... ${NC}";
+npm run lint;
+if [ $? -ne 0 ];
+then
+    echo -e "${BRed}❌ Análise estática falhou! ${NC}";
+    exit 1;
+fi;
+
+echo -e "${BIBlue}🧪 Executando testes unitários... ${NC}";
+npm run test:run;
+if [ $? -ne 0 ];
+then
+    echo -e "${BRed}❌ Testes falharam! ${NC}";
+    exit 1;
+fi;
+
+echo -e "${BIBlue}🤖 Executando testes E2E com Cypress... ${NC}";
+npm run cy:run;
+if [ $? -ne 0 ];
+then
+    echo -e "${BRed}❌ Testes E2E falharam! ${NC}";
+    exit 1;
+fi;
+
+echo -e "\n${BGreen}                                   ${NC}";
+echo -e "${BGreen}  Tudo certo! Push concluído 👮🎉  ${NC}";
+echo -e "${BGreen}                                   ${NC}\n";
+exit 0;
